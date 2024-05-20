@@ -9,9 +9,17 @@ struct Args {
     #[arg(short='c')]
     bytes: bool,
 
-    /// Number of times to greet
+    /// Number of lines in the file
     #[arg(short='l')]
     lines: bool,
+
+    // Number of words in the file
+    #[arg(short='w')]
+    words: bool,
+
+    // Number of chars in the file
+    #[arg(short='m')]
+    chars: bool,
 
     file: String,
 }
@@ -26,14 +34,31 @@ fn main() {
         res.push_str(size.to_string().as_str());
         res.push_str(" bytes");
     }
-    if args.lines {
-        let mut lines = 0;
+    if args.lines || args.words || args.chars {
+        let mut lines: i32 = 0;
+        let mut words: i32 = 0;
         let file_str = fs::read_to_string(&file).expect("Should have been able to read the file");
-        for _line in file_str.lines() {
+        let chars = file_str.chars().count();
+        for line in file_str.lines() {
+            for _word in line.split_whitespace() {
+                words += 1;
+            }
             lines += 1;
         }
-        let lines_op = format!(" {lines} lines");
-        res.push_str(&*lines_op);
+
+        if args.chars {
+            let chars_op = format!(" {chars} chars");
+            res.push_str(&*chars_op);
+        }
+
+        if args.words {
+            let words_op = format!(" {words} words");
+            res.push_str(&*words_op);
+        }
+        if args.lines {
+            let lines_op = format!(" {lines} lines");
+            res.push_str(&*lines_op);
+        }
     }
 
     res.push_str(" ");
